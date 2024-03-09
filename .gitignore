@@ -1,0 +1,13 @@
+__pycache__/
+.*.swp
+.*.swo
+.idea/
+
+/.tox/
+/lib/*.egg-info/
+
+/.pybuild/
+/debian/.debhelper/
+/debian/*.substvars
+
+/.pythonpath/
