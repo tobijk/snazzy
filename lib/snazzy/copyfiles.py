@@ -23,26 +23,46 @@
 # THE SOFTWARE.
 #
 
+import logging
 import os
 import shutil
 
 from snazzy.task import Task
 
+LOGGER = logging.getLogger(__name__)
+
 class CopyFiles(Task):
 
-    def execute(self):
+    def execute(self) -> None:
         for entry in self._objects:
-            srcfile = os.path.normpath(
-                os.sep.join([self._basedir, entry])
-            )
+            LOGGER.info("processing {}".format(entry))
+            self._process_entry(entry)
 
-            destdir = os.path.normpath(
-                os.sep.join([self._sitedir, os.path.dirname(entry)])
-            )
+    def _process_entry(self, entry: str) -> None:
+        srcfile = os.path.normpath(
+            os.sep.join([self._basedir, entry])
+        )
 
-            os.makedirs(destdir, exist_ok=True)
+        destdir = os.path.normpath(
+            os.sep.join([self._sitedir, os.path.dirname(entry)])
+        )
+
+        os.makedirs(destdir, exist_ok=True)
+
+        if entry.endswith(".scss"):
+            dstfile = os.path.normpath(
+                os.sep.join([self._sitedir, entry[:-4] + "css"])
+            )
+            self._convert_scss(srcfile, dstfile)
+
+        elif entry.endswith(".js"):
+            dstfile = os.path.normpath(
+                os.sep.join([self._sitedir, entry])
+            )
+            self._convert_js(srcfile, dstfile)
+
+        else:
             shutil.copy2(srcfile, destdir)
-        #end for
     #end function
 
 #end class

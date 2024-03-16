@@ -36,7 +36,7 @@ class SnazzyCli:
     EXIT_ERR = 1
 
     @classmethod
-    def snazzy(cls):
+    def snazzy(cls) -> None:
         usage = textwrap.dedent(
         """\
         USAGE:
@@ -80,7 +80,7 @@ class SnazzyCli:
     #end function
 
     @classmethod
-    def prepare(cls, *args):
+    def prepare(cls, *args: list[str]) -> None:
         usage = textwrap.dedent(
         """\
         USAGE:
@@ -125,7 +125,7 @@ class SnazzyCli:
     #end function
 
     @classmethod
-    def make(cls, *args):
+    def make(cls, *args: list[str]) -> None:
         usage = textwrap.dedent(
         """\
         USAGE:
@@ -162,7 +162,7 @@ class SnazzyCli:
     #end function
 
     @classmethod
-    def clean(cls, *args):
+    def clean(cls, *args: list[str]) -> None:
         usage = textwrap.dedent(
         """\
         USAGE:
@@ -188,7 +188,7 @@ class SnazzyCli:
     #end function
 
     @classmethod
-    def distclean(cls, *args):
+    def distclean(cls, *args: list[str]) -> None:
         usage = textwrap.dedent(
         """\
         USAGE:

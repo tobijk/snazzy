@@ -23,6 +23,7 @@
 # THE SOFTWARE.
 #
 
+import logging
 import os
 import shlex
 import shutil
@@ -33,15 +34,17 @@ from pathspec import PathSpec
 
 from snazzy.appmaker import AppMaker
 from snazzy.copyfiles import CopyFiles
-from snazzy.cssmaker import CssMaker
 from snazzy.preptask import PrepTask
+from snazzy.task import Task
+
+LOGGER = logging.getLogger(__name__)
 
 class SiteMaker:
 
     def prepare(
             self,
             npm_reinstall: bool = False,
-            npm_update: bool = False):
+            npm_update: bool = False) -> "SiteMaker":
 
         self \
             ._create_gitignore() \
@@ -51,7 +54,7 @@ class SiteMaker:
         return self
     #end function
 
-    def make(self, debug: bool = False):
+    def make(self, debug: bool = False) -> "SiteMaker":
         tasks = self._create_tasks(debug=debug)
 
         for t in tasks:
@@ -60,14 +63,15 @@ class SiteMaker:
         return self
     #end function
 
-    def clean(self):
+    def clean(self) -> "SiteMaker":
         if os.path.exists("_site"):
+            LOGGER.info("removing _site folder")
             shutil.rmtree("_site")
 
         return self
     #end function
 
-    def distclean(self):
+    def distclean(self) -> "SiteMaker":
         self.clean()
 
         things_to_remove = [
@@ -80,6 +84,7 @@ class SiteMaker:
             if not os.path.exists(item):
                 continue
 
+            LOGGER.info("removing {}".format(item))
             shutil.rmtree(item) if os.path.isdir(item) \
                 else os.unlink(item)
         #end for
@@ -89,9 +94,11 @@ class SiteMaker:
 
     # HELPERS
 
-    def _create_gitignore(self):
+    def _create_gitignore(self) -> "SiteMaker":
         if os.path.exists(".gitignore"):
             return self
+
+        LOGGER.info("creating initial .gitignore file")
 
         with open(".gitignore", "w+", encoding="utf-8") as f:
             f.write(
@@ -112,7 +119,7 @@ class SiteMaker:
     def _npm_install_or_update(
             self,
             npm_reinstall: bool = False,
-            npm_update: bool = False):
+            npm_update: bool = False) -> "SiteMaker":
 
         modules = [
             "@babel/core",
@@ -135,13 +142,17 @@ class SiteMaker:
         else:
             cmd = ["npm", "install", "--save-dev", *modules]
 
+        LOGGER.info("running npm {}...".format(cmd[1]))
+
         subprocess.run(cmd)
         return self
     #end function
 
-    def _create_babel_rc(self):
+    def _create_babel_rc(self) -> "SiteMaker":
         if os.path.exists(".babelrc"):
             return self
+
+        LOGGER.info("creating .babelrc")
 
         with open(".babelrc", "w+", encoding="utf-8") as f:
             f.write(
@@ -158,7 +169,7 @@ class SiteMaker:
         return self
     #end function
 
-    def _make_ignore_spec(self):
+    def _make_ignore_spec(self) -> PathSpec:
         ignore_patterns = [
             "/environment.sh",
             "/.git/",
@@ -185,7 +196,7 @@ class SiteMaker:
         return PathSpec.from_lines("gitignore", ignore_patterns)
     #end function
 
-    def _create_tasks(self, debug: bool = False):
+    def _create_tasks(self, debug: bool = False) -> list[Task]:
         ignore_spec = self._make_ignore_spec()
 
         basedir = os.path.abspath(".")
@@ -193,19 +204,21 @@ class SiteMaker:
 
         preptask = PrepTask(basedir, sitedir, debug)
         appmaker = AppMaker(basedir, sitedir, debug)
-        cssmaker = CssMaker(basedir, sitedir, debug)
         copyfiles = CopyFiles(basedir, sitedir, debug)
 
         module_by_extension = {
             "css":  copyfiles,
             "gif":  copyfiles,
             "html": appmaker,
+            "ico":  copyfiles,
             "jpg":  copyfiles,
             "js":   copyfiles,
             "png":  copyfiles,
-            "scss": cssmaker,
+            "scss": copyfiles,
             "svg":  copyfiles,
         }
+
+        LOGGER.info("compiling tasks")
 
         for dirpath, dirnames, filenames in os.walk(basedir):
             for entry in filenames:
@@ -224,7 +237,7 @@ class SiteMaker:
             #end for
         #end for
 
-        return [preptask, copyfiles, cssmaker, appmaker]
+        return [preptask, copyfiles, appmaker]
     #end function
 
 #end function

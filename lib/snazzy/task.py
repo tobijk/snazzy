@@ -23,6 +23,10 @@
 # THE SOFTWARE.
 #
 
+import os
+import shutil
+import subprocess
+
 class Task:
 
     def __init__(self, basedir: str, sitedir: str, debug: bool = False):
@@ -32,12 +36,56 @@ class Task:
         self._objects = []
     #end function
 
-    def add_object(self, entry):
+    def add_object(self, entry: str) -> None:
         self._objects.append(entry)
 
-    def execute(self):
+    def execute(self) -> None:
         raise NotImplementedError(
             "{} has no execute method".format(self.__class__.__name__)
         )
+
+    def _convert_scss(self, srcfile: str, dstfile: str) -> None:
+        cmd = [
+            "node_modules/.bin/sass",
+                "-I", os.path.dirname(srcfile),
+                    "-s", "expanded" if self._debug else "compressed",
+                        "--no-source-map",
+                            srcfile, dstfile
+        ]
+
+        subprocess.run(cmd)
+    #end function
+
+    def _convert_js(self, srcfile: str, dstfile: str) -> None:
+        if self._debug:
+            shutil.copyfile(srcfile, dstfile)
+            return
+
+        cmd = [
+            "./node_modules/.bin/babel",
+                "--minified", "-o", dstfile, srcfile
+        ]
+
+        subprocess.run(cmd)
+    #end function
+
+    def _convert_js_in_memory(self, srcfile: str) -> str:
+        with open(srcfile, "r", encoding="utf-8") as f:
+            ibuf = f.read()
+
+        if self._debug:
+            return ibuf
+
+        cmd = [
+            "./node_modules/.bin/babel",
+                "--minified", "--filename", "app.js"
+        ]
+
+        obuf = subprocess.run(
+            cmd, input=ibuf, stdout=subprocess.PIPE, universal_newlines=True
+        )
+
+        return result.stdout
+    #end function
 
 #end class

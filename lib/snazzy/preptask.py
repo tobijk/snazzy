@@ -23,13 +23,71 @@
 # THE SOFTWARE.
 #
 
+import logging
+import os
+import shutil
+
+from snazzy.error import SnazzyError
 from snazzy.task import Task
+
+LOGGER = logging.getLogger(__name__)
 
 class PrepTask(Task):
 
-    def execute(self):
-        # 2. Copy Handlebars, jQuery, Marked into place (make each of these
-        #    optional)
-        pass
+    def execute(self) -> None:
+        self._sanity_check()
+
+        for module in ["handlebars", "jquery", "marked"]:
+            self._copy_js_module(module)
+    #end function
+
+    def _sanity_check(self) -> None:
+        for item in ["package.json", "node_modules"]:
+            if not os.path.exists(item):
+                raise SnazzyError(
+                    "{} not found, did you run snazzy prepare?".format(item)
+                )
+    #end function
+
+    def _copy_js_module(self, module_name: str) -> None:
+        LOGGER.info(
+            "installing {} to /static/ext/js folder".format(module_name)
+        )
+
+        search_paths = [
+            os.path.join(
+                self._basedir,
+                "node_modules",
+                module_name,
+                "dist",
+                "{}.min.js".format(module_name)
+            ),
+            os.path.join(
+                self._basedir,
+                "node_modules",
+                module_name,
+                "{}.min.js".format(module_name)
+            )
+        ]
+
+        srcfile = None
+
+        for path in search_paths:
+            if os.path.exists(path):
+                srcfile = path
+
+        if not srcfile:
+            raise SnazzyError(
+                "cannot find {}, did you run snazzy prepare?"
+                .format(module_name)
+            )
+
+        destdir = os.path.join(self._sitedir, "static", "ext", "js")
+        dstfile = os.path.join(destdir, "{}.js".format(module_name))
+
+        if not os.path.exists(dstfile):
+            os.makedirs(destdir, exist_ok=True)
+            shutil.copyfile(srcfile, dstfile)
+    #end function
 
 #end class
