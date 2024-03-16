@@ -31,19 +31,10 @@ from snazzy.cli import SnazzyCli
 from snazzy.logformatter import LogFormatter
 
 EXIT_ERR = 1
-
 LOGGER = logging.getLogger()
 
-def configure_logging():
-    fmt = LogFormatter("snazzy")
-    handler = logging.StreamHandler()
-    handler.setFormatter(fmt)
-    LOGGER.addHandler(handler)
-    LOGGER.setLevel(logging.INFO)
-#end function
-
 if __name__ == "__main__":
-    configure_logging()
+    LogFormatter.configure(LOGGER, "cli", "snazzy")
 
     try:
         SnazzyCli.snazzy()
