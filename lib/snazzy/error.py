@@ -23,11 +23,14 @@
 # THE SOFTWARE.
 #
 
-from snazzy.task import Task
+class SnazzyError(Exception):
+    pass
 
-class CssMaker(Task):
+class ExitOK(SnazzyError):
+    pass
 
-    def execute(self):
-        pass
+class ExitError(SnazzyError):
+    pass
 
-#end class
+class InvocationError(SnazzyError):
+    pass

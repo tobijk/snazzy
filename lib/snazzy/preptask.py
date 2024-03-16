@@ -25,9 +25,11 @@
 
 from snazzy.task import Task
 
-class CssMaker(Task):
+class PrepTask(Task):
 
     def execute(self):
+        # 2. Copy Handlebars, jQuery, Marked into place (make each of these
+        #    optional)
         pass
 
 #end class
