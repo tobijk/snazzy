@@ -26,11 +26,5 @@
 class SnazzyError(Exception):
     pass
 
-class ExitOK(SnazzyError):
-    pass
-
-class ExitError(SnazzyError):
-    pass
-
 class InvocationError(SnazzyError):
     pass

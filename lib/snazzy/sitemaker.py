@@ -25,6 +25,7 @@
 
 import os
 import shlex
+import shutil
 import subprocess
 import textwrap
 
@@ -90,7 +91,7 @@ class SiteMaker:
 
     def _create_gitignore(self):
         if os.path.exists(".gitignore"):
-            return
+            return self
 
         with open(".gitignore", "w+", encoding="utf-8") as f:
             f.write(
@@ -140,7 +141,7 @@ class SiteMaker:
 
     def _create_babel_rc(self):
         if os.path.exists(".babelrc"):
-            return
+            return self
 
         with open(".babelrc", "w+", encoding="utf-8") as f:
             f.write(
@@ -175,8 +176,9 @@ class SiteMaker:
 
             with open(ignore_file, "r", encoding="utf-8") as f:
                 ignore_patterns += \
-                    [line for line in [line.strip() for line in f.readlines()] \
-                        if line and not line.startswith("#")]
+                    [line for line in \
+                        [line.strip() for line in f.readlines()] \
+                            if line and not line.startswith("#")]
             #end with
         #end for
 
