@@ -35,10 +35,18 @@ class SnazzyCli:
     EXIT_OK  = 0
     EXIT_ERR = 1
 
+    COPYRIGHT = textwrap.dedent(
+    """\
+    Copyright (c) 2024, Tobias Koch <tobias.koch@gmail.com>
+
+    """)
+
     @classmethod
     def snazzy(cls) -> None:
-        usage = textwrap.dedent(
+        usage = SnazzyCli.COPYRIGHT + textwrap.dedent(
         """\
+          This is the snazzy low-npm frontend framework build tool.
+
         USAGE:
 
           snazzy <command> [options]
@@ -81,8 +89,12 @@ class SnazzyCli:
 
     @classmethod
     def prepare(cls, *args: list[str]) -> None:
-        usage = textwrap.dedent(
+        usage = SnazzyCli.COPYRIGHT + textwrap.dedent(
         """\
+          This command installs the minimum amount of node modules needed to
+          do meaningful frontend development. It also creates an initial
+          .gitignore file and a .babelrc.
+
         USAGE:
 
           snazzy prepare [options]
@@ -126,8 +138,11 @@ class SnazzyCli:
 
     @classmethod
     def make(cls, *args: list[str]) -> None:
-        usage = textwrap.dedent(
+        usage = SnazzyCli.COPYRIGHT + textwrap.dedent(
         """\
+          This command generates the _site directory, copies static assets,
+          processes Scss and JavaScript files and compiles the SPA(s).
+
         USAGE:
 
           snazzy make [options]
@@ -163,8 +178,10 @@ class SnazzyCli:
 
     @classmethod
     def clean(cls, *args: list[str]) -> None:
-        usage = textwrap.dedent(
+        usage = SnazzyCli.COPYRIGHT + textwrap.dedent(
         """\
+          This command removes the _site directory.
+
         USAGE:
 
           snazzy clean
@@ -189,8 +206,10 @@ class SnazzyCli:
 
     @classmethod
     def distclean(cls, *args: list[str]) -> None:
-        usage = textwrap.dedent(
+        usage = SnazzyCli.COPYRIGHT + textwrap.dedent(
         """\
+          This command returns the source tree to its pristine state.
+
         USAGE:
 
           snazzy distclean
