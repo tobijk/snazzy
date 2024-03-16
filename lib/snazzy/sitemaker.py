@@ -25,7 +25,6 @@
 
 import logging
 import os
-import shlex
 import shutil
 import subprocess
 import textwrap
@@ -187,8 +186,8 @@ class SiteMaker:
 
             with open(ignore_file, "r", encoding="utf-8") as f:
                 ignore_patterns += \
-                    [line for line in \
-                        [line.strip() for line in f.readlines()] \
+                    [line for line in
+                        [line.strip() for line in f.readlines()]
                             if line and not line.startswith("#")]
             #end with
         #end for

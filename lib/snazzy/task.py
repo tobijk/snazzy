@@ -81,7 +81,7 @@ class Task:
                 "--minified", "--filename", "app.js"
         ]
 
-        obuf = subprocess.run(
+        result = subprocess.run(
             cmd, input=ibuf, stdout=subprocess.PIPE, universal_newlines=True
         )
 
