@@ -8,5 +8,5 @@ Single page applications are built from single file components, which are XML
 files containing a) a template section, b) a script section and c) a style
 section. All programming is done in pure, object-oriented JavaScript.
 
-Since Snazzy apps are hand-crafted, they send to be small, meaning they load
+Since Snazzy apps are hand-crafted, they tend to be small -- meaning they load
 swiftly and run efficiently.
