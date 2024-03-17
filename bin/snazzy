@@ -24,21 +24,7 @@
 # THE SOFTWARE.
 #
 
-import logging
-import sys
-
 from snazzy.cli import SnazzyCli
-from snazzy.logformatter import LogFormatter
-
-EXIT_ERR = 1
-LOGGER = logging.getLogger()
 
 if __name__ == "__main__":
-    LogFormatter.configure(LOGGER, "cli", "snazzy")
-
-    try:
-        SnazzyCli.snazzy()
-    except Exception as e:
-        LOGGER.error(e)
-        sys.exit(EXIT_ERR)
-#end __main__
+    SnazzyCli.main()

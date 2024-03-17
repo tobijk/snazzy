@@ -24,11 +24,15 @@
 #
 
 import getopt
+import logging
 import sys
 import textwrap
 
 from snazzy.error import InvocationError
+from snazzy.logformatter import LogFormatter
 from snazzy.sitemaker import SiteMaker
+
+LOGGER = logging.getLogger()
 
 class SnazzyCli:
 
@@ -40,6 +44,17 @@ class SnazzyCli:
     Copyright (c) 2024, Tobias Koch <tobias.koch@gmail.com>
 
     """)
+
+    @classmethod
+    def main(cls) -> None:
+        LogFormatter.configure(LOGGER, "cli", "snazzy")
+
+        try:
+            SnazzyCli.snazzy()
+        except Exception as e:
+            LOGGER.error(e)
+            sys.exit(SnazzyCli.EXIT_ERR)
+    #end function
 
     @classmethod
     def snazzy(cls) -> None:
