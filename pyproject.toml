@@ -2,8 +2,14 @@
 name = "snazzy"
 version = "0.1.0"
 description = "The low-npm frontend framework"
+
 authors = [
     {name = "Tobias Koch", email = "tobias.koch@gmail.com"},
+]
+
+dependencies = [
+    "pytidylib",
+    "lxml"
 ]
 
 [build-system]
