@@ -81,7 +81,8 @@ class SnazzyCli:
 
         try:
             getattr(cls, command)(*args[1:])
-        except AttributeError:
+        except AttributeError as e:
+            print(e)
             raise InvocationError(
                 "unknown command \"{}\"".format(command)
             )

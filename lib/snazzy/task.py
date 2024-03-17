@@ -26,6 +26,10 @@
 import os
 import shutil
 import subprocess
+import sys
+
+from lxml import etree
+from tidylib import tidy_document
 
 class Task:
 
@@ -56,6 +60,20 @@ class Task:
         subprocess.run(cmd)
     #end function
 
+    def _convert_scss_in_memory(self, scss: str) -> str:
+        cmd = [
+            "node_modules/.bin/sass",
+                    "-s", "expanded" if self._debug else "compressed",
+                        "--no-source-map", "--stdin"
+        ]
+
+        result = subprocess.run(
+            cmd, input=scss, stdout=subprocess.PIPE, universal_newlines=True
+        )
+
+        return result.stdout
+    #end function
+
     def _convert_js(self, srcfile: str, dstfile: str) -> None:
         if self._debug:
             shutil.copyfile(srcfile, dstfile)
@@ -63,29 +81,107 @@ class Task:
 
         cmd = [
             "./node_modules/.bin/babel",
-                "--minified", "-o", dstfile, srcfile
+                "--minified",
+                    "--no-comments",
+                        "-o", dstfile, srcfile
         ]
 
         subprocess.run(cmd)
     #end function
 
-    def _convert_js_in_memory(self, srcfile: str) -> str:
-        with open(srcfile, "r", encoding="utf-8") as f:
-            ibuf = f.read()
-
+    def _convert_js_in_memory(self, js: str) -> str:
         if self._debug:
-            return ibuf
+            return js
 
         cmd = [
             "./node_modules/.bin/babel",
-                "--minified", "--filename", "app.js"
+                "--minified",
+                    "--no-comments",
+                        "--filename", "app.js"
         ]
 
         result = subprocess.run(
-            cmd, input=ibuf, stdout=subprocess.PIPE, universal_newlines=True
+            cmd, input=js, stdout=subprocess.PIPE, universal_newlines=True
         )
 
         return result.stdout
+    #end function
+
+    def _process_html(self, srcfile: str, dstfile: str) -> None:
+        with open(srcfile, "r", encoding="utf-8") as f:
+            html_str = f.read()
+
+        tidy_opts = {
+            "doctype": "html5",
+            "drop-empty-elements": False,
+            "hide-comments": True,
+            "indent": False,
+            "tidy-mark": False,
+            "vertical-space": "auto",
+            "wrap": 0,
+        }
+
+        if self._debug:
+            tidy_opts.update({
+                "hide-comments": False,
+                "indent": True,
+                "vertical-space": "no",
+                "wrap": 100,
+            })
+        #end if
+
+        tidy_str, tidy_errors = tidy_document(html_str, tidy_opts)
+
+        if tidy_errors:
+            sys.stderr.write(tidy_errors)
+
+        with open(dstfile, "w+", encoding="utf-8") as f:
+            f.write(tidy_str)
+    #end function
+
+    def _process_component_xml(self, srcfile: str) -> tuple[str, str, str]:
+        template   = ""
+        script     = ""
+        stylesheet = ""
+
+        tree = etree.parse(srcfile)
+        root = tree.getroot()
+
+        component_name = root.get("name", os.path.basename(srcfile)[:-4])
+
+        template_node = root.find("template")
+        script_node   = root.find("script")
+        style_node    = root.find("style")
+
+        if template_node is not None:
+            handlebars = "".join(
+                etree.tostring(child, encoding="unicode", method="html")
+                    for child in template_node
+            )
+
+            # TODO: find a better solution for this.
+            handlebars = handlebars\
+                .replace("%7B%7B", "{{")\
+                .replace("%7D%7D", "}}")
+
+            cmd = ["./node_modules/.bin/handlebars", "--name",
+                    component_name, "-i", "-"]
+
+            result = subprocess.run(cmd, input=handlebars, check=True,
+                stdout=subprocess.PIPE, universal_newlines=True)
+
+            template = self._convert_js_in_memory(result.stdout)
+        #end if
+
+        if script_node is not None:
+            script = \
+                self._convert_js_in_memory(script_node.text)
+
+        if style_node is not None:
+            stylesheet = \
+                self._convert_scss_in_memory(style_node.text)
+
+        return template, script, stylesheet
     #end function
 
 #end class

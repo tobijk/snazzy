@@ -23,11 +23,76 @@
 # THE SOFTWARE.
 #
 
+import logging
+import os
+import tempfile
+
 from snazzy.task import Task
+
+LOGGER = logging.getLogger(__name__)
 
 class AppMaker(Task):
 
     def execute(self):
-        pass
+        for entry in self._objects:
+            LOGGER.info("building SPA from {}".format(entry))
+            self._generate_app(entry)
+
+    def _generate_app(self, entry):
+        srcfile = os.path.normpath(
+            os.sep.join([self._basedir, entry])
+        )
+
+        destdir = os.path.normpath(
+            os.sep.join([self._sitedir, os.path.dirname(entry)])
+        )
+
+        os.makedirs(destdir, exist_ok=True)
+
+        dstfile = os.path.normpath(
+            os.sep.join([self._sitedir, entry])
+        )
+
+        self._process_html(srcfile, dstfile)
+
+        appdir = os.path.join(os.path.dirname(srcfile), "+app")
+        appjs  = os.path.join(os.path.dirname(srcfile), "+app.js")
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpjs  = os.path.join(tmpdir, "app.js")
+            tmpcss = os.path.join(tmpdir, "app.css")
+
+            for dirpath, dirnames, filenames in os.walk(appdir):
+                for entry in filenames:
+                    if not entry.endswith(".xml"):
+                        continue
+
+                    template, script, stylesheet = \
+                        self._process_component_xml(
+                            os.path.join(dirpath, entry)
+                        )
+
+                    with open(tmpjs, "a+", encoding="utf-8") as f:
+                        f.write(template)
+                        f.write(script)
+
+                    with open(tmpcss, "a+", encoding="utf-8") as f:
+                        f.write(stylesheet)
+                #end for
+            #end for
+
+            with open(appjs, "r", encoding="utf-8") as f:
+                script = self._convert_js_in_memory(f.read())
+
+            with open(tmpjs, "a+", encoding="utf-8") as f:
+                f.write(script)
+
+            appjs  = os.path.join(os.path.dirname(dstfile), "app.js")
+            appcss = os.path.join(os.path.dirname(dstfile), "app.css")
+
+            os.rename(tmpjs,  appjs)
+            os.rename(tmpcss, appcss)
+        #end with
+    #end function
 
 #end class
