@@ -35,8 +35,9 @@ class AppMaker(Task):
 
     def execute(self):
         for entry in self._objects:
-            LOGGER.info("building SPA from {}".format(entry))
+            LOGGER.info("building SPA at {}".format(os.path.dirname(entry)))
             self._generate_app(entry)
+    #end function
 
     def _generate_app(self, entry):
         srcfile = os.path.normpath(

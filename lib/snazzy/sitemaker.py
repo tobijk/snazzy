@@ -106,6 +106,7 @@ class SiteMaker:
                     /.babelrc
                     /_site/
                     /node_modules/
+                    /package-lock.json
                     .*.swp
                     """
                 )

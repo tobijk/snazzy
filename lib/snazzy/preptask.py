@@ -50,10 +50,6 @@ class PrepTask(Task):
     #end function
 
     def _copy_js_module(self, module_name: str) -> None:
-        LOGGER.info(
-            "installing {} to /static/ext/js folder".format(module_name)
-        )
-
         search_paths = [
             os.path.join(
                 self._basedir,
@@ -84,6 +80,11 @@ class PrepTask(Task):
 
         destdir = os.path.join(self._sitedir, "static", "ext", "js")
         dstfile = os.path.join(destdir, "{}.js".format(module_name))
+
+        LOGGER.info(
+            "installing {} to /static/ext/js/{}"
+            .format(module_name, os.path.basename(dstfile))
+        )
 
         if not os.path.exists(dstfile):
             os.makedirs(destdir, exist_ok=True)
