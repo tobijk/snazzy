@@ -51,6 +51,9 @@ class SnazzyCli:
 
         try:
             SnazzyCli.snazzy()
+        except KeyboardInterrupt:
+            LOGGER.error("caught keyboard interrupt, exiting.")
+            sys.exit(SnazzyCli.EXIT_ERR)
         except Exception as e:
             LOGGER.error(e)
             sys.exit(SnazzyCli.EXIT_ERR)
