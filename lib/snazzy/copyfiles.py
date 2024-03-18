@@ -43,6 +43,9 @@ class CopyFiles(Task):
             os.sep.join([self._basedir, entry])
         )
 
+        if entry.startswith("/static/"):
+            entry = "/static/" + self._prefix + entry[len("/static"):]
+
         destdir = os.path.normpath(
             os.sep.join([self._sitedir, os.path.dirname(entry)])
         )

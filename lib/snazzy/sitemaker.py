@@ -25,7 +25,9 @@
 
 import logging
 import os
+import random
 import shutil
+import string
 import subprocess
 import textwrap
 
@@ -202,9 +204,11 @@ class SiteMaker:
         basedir = os.path.abspath(".")
         sitedir = os.path.join(basedir, "_site")
 
-        preptask = PrepTask(basedir, sitedir, debug)
-        appmaker = AppMaker(basedir, sitedir, debug)
-        copyfiles = CopyFiles(basedir, sitedir, debug)
+        prefix = self._generate_random_string(8) if not debug else ""
+
+        preptask = PrepTask(basedir, sitedir, debug, prefix)
+        appmaker = AppMaker(basedir, sitedir, debug, prefix)
+        copyfiles = CopyFiles(basedir, sitedir, debug, prefix)
 
         module_by_extension = {
             "css":  copyfiles,
@@ -238,6 +242,12 @@ class SiteMaker:
         #end for
 
         return [preptask, copyfiles, appmaker]
+    #end function
+
+    def _generate_random_string(self, length):
+        return ''.join(
+            random.choices(string.digits + string.ascii_lowercase, k=length)
+        )
     #end function
 
 #end function

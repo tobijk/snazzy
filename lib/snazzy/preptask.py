@@ -78,8 +78,12 @@ class PrepTask(Task):
                 .format(module_name)
             )
 
-        destdir = os.path.join(self._sitedir, "static", "ext", "js")
-        dstfile = os.path.join(destdir, "{}.js".format(module_name))
+        destdir = os.path.join(
+            self._sitedir, "static", self._prefix, "ext", "js"
+        )
+        dstfile = os.path.join(
+            destdir, "{}.js".format(module_name)
+        )
 
         LOGGER.info(
             "installing {} to /static/ext/js/{}"
