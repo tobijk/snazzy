@@ -48,23 +48,32 @@ class Task:
         )
 
     def _convert_scss(self, srcfile: str, dstfile: str) -> None:
-        cmd = [
-            "node_modules/.bin/sass",
-                "-I", os.path.dirname(srcfile),
-                    "-s", "expanded" if self._debug else "compressed",
-                        "--no-source-map",
-                            srcfile, dstfile
-        ]
+        with open(srcfile, "r") as f:
+            scss = f.read()
 
-        subprocess.run(cmd)
+        css = self._convert_scss_in_memory(scss, [os.path.dirname(srcfile)])
+
+        with open(dstfile, "w") as f:
+            f.write(css)
     #end function
 
-    def _convert_scss_in_memory(self, scss: str) -> str:
+    def _convert_scss_in_memory(
+            self, scss: str, include_paths: list[str] = None) -> str:
+        if include_paths is None:
+            include_paths = []
+
+        scss = scss.replace("##STATIC##",
+            os.path.normpath(os.sep.join(["/static", self._prefix])))
+
         cmd = [
             "node_modules/.bin/sass",
                     "-s", "expanded" if self._debug else "compressed",
                         "--no-source-map", "--stdin"
         ]
+
+        for path in include_paths:
+            cmd.append("-I")
+            cmd.append(path)
 
         result = subprocess.run(
             cmd, input=scss, stdout=subprocess.PIPE, universal_newlines=True
