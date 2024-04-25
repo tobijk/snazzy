@@ -25,6 +25,7 @@
 
 import getopt
 import logging
+import re
 import sys
 import textwrap
 
@@ -75,6 +76,7 @@ class SnazzyCli:
           make
           clean
           distclean
+          new
 
         Type 'snazzy <command> --help' for help on individual commands.
         """)
@@ -248,6 +250,46 @@ class SnazzyCli:
                 sys.exit(SnazzyCli.EXIT_OK)
 
         SiteMaker().distclean()
+    #end function
+
+    @classmethod
+    def new(cls, *args: list[str]) -> None:
+        usage = SnazzyCli.COPYRIGHT + textwrap.dedent(
+        """\
+          This command creates a new component and dumps it to stdout.
+
+        USAGE:
+
+          snazzy new <component-name>
+
+        """
+        )
+
+        try:
+            opts, args = getopt.getopt(args, "h", ["help"])
+        except getopt.GetoptError as e:
+            raise InvocationError(
+                "error parsing command line: {}".format(str(e))
+            )
+
+        for o, v in opts:
+            if o in ["-h", "--help"]:
+                sys.stdout.write(usage)
+                sys.exit(SnazzyCli.EXIT_OK)
+
+        if len(args) != 1:
+            raise InvocationError(
+                "missing argument <component-name>"
+            )
+
+        component_name = args[0]
+
+        if not re.match(r"^[a-z]+[a-z0-9]*(?:-[a-z0-9]+)*$", component_name):
+            raise InvocationError(
+                "invalid component name \"{}\"".format(component_name)
+            )
+
+        SiteMaker().new(component_name)
     #end function
 
 #end function

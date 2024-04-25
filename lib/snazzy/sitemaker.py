@@ -29,11 +29,13 @@ import random
 import shutil
 import string
 import subprocess
+import sys
 import textwrap
 
 from pathspec import PathSpec
 
 from snazzy.appmaker import AppMaker
+from snazzy.component import Component
 from snazzy.copyfiles import CopyFiles
 from snazzy.preptask import PrepTask
 from snazzy.task import Task
@@ -90,6 +92,11 @@ class SiteMaker:
                 else os.unlink(item)
         #end for
 
+        return self
+    #end function
+
+    def new(self, component_name) -> "SiteMaker":
+        sys.stdout.write(Component(component_name).generate())
         return self
     #end function
 
