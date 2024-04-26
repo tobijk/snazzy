@@ -55,6 +55,10 @@ class {class_name} {{
         var template = Handlebars.templates["{name}"];
         return $(template(context));
     }}
+
+    mount(element) {{
+        element.replaceWith(this.tree);
+    }}
 }}
         ]]>
     </script>
@@ -67,7 +71,7 @@ class {class_name} {{
     <style>
         <![CDATA[
 
-.package-list-entry[data-css-scope-{scope}] {{
+.{name}[data-css-scope-{scope}] {{
     // Component CSS here
 }}
 
