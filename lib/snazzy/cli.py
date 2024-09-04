@@ -101,7 +101,7 @@ class SnazzyCli:
 
         try:
             getattr(cls, command)(*args[1:])
-        except AttributeError as e:
+        except AttributeError:
             raise InvocationError(
                 "unknown command \"{}\"".format(command)
             )
@@ -193,6 +193,11 @@ class SnazzyCli:
                 options["debug"] = True
         #end for
 
+        if len(args) > 0:
+            raise InvocationError(
+                "garbage at end of command line"
+            )
+
         SiteMaker().make(**options)
     #end function
 
@@ -221,6 +226,11 @@ class SnazzyCli:
                 sys.stdout.write(usage)
                 sys.exit(SnazzyCli.EXIT_OK)
 
+        if len(args) > 0:
+            raise InvocationError(
+                "garbage at end of command line"
+            )
+
         SiteMaker().clean()
     #end function
 
@@ -248,6 +258,11 @@ class SnazzyCli:
             if o in ["-h", "--help"]:
                 sys.stdout.write(usage)
                 sys.exit(SnazzyCli.EXIT_OK)
+
+        if len(args) > 0:
+            raise InvocationError(
+                "garbage at end of command line"
+            )
 
         SiteMaker().distclean()
     #end function

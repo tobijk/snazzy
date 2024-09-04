@@ -25,6 +25,7 @@
 
 import logging
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -203,10 +204,13 @@ class AppMaker(Task):
                 if not attr:
                     continue
 
-                if attr.startswith("static/"):
+                m = re.match(r"(/)?static/", attr)
+
+                if m:
                     element.set(
-                        attr_name, "static/{}/{}"
-                            .format(self._prefix, attr[len("static/"):])
+                        attr_name, "{}static/{}/{}".format(
+                            m.group(1) or "", self._prefix, attr[m.end():]
+                        )
                     )
                 elif attr in ["app.js", "app.css"]:
                     element.set(
