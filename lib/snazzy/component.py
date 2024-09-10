@@ -33,7 +33,7 @@ TEMPLATE = """\
       -
       -/////////////////////////////////////////////////////////////////////-->
     <template>
-        <div class="{name}" data-css-scope-{scope}=""></div>
+        <div class="{name}-container" data-css-scope-{scope}=""></div>
     </template>
 
     <!--///////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ class {class_name} {{
     <style>
         <![CDATA[
 
-.{name}[data-css-scope-{scope}] {{
+.{name}-container[data-css-scope-{scope}] {{
     // Component CSS here
 }}
 
