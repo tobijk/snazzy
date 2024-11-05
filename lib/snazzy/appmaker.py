@@ -94,6 +94,9 @@ class AppMaker(Task):
             with open(tmpjs, "a+", encoding="utf-8") as f:
                 f.write(script)
 
+            with open(tmpcss, "a+", encoding="utf-8"):
+                pass
+
             appjs = os.path.join(
                 os.path.dirname(dstfile), "app.js" if self._debug
                     else "app-{}.js".format(self._prefix)
