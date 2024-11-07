@@ -24,8 +24,11 @@
 #
 
 import os
+import re
 import shutil
 import subprocess
+
+from lxml import etree
 
 class Task:
 
@@ -112,6 +115,33 @@ class Task:
         )
 
         return result.stdout
+    #end function
+
+    def _apply_static_asset_prefix(self, fragment: etree.Element) -> None:
+        if not self._prefix:
+            return
+
+        for element in fragment.xpath("//*[@src] | //*[@href]"):
+            for attr_name in ["src", "href"]:
+                attr = element.get(attr_name)
+                if not attr:
+                    continue
+
+                m = re.match(r"(/)?static/", attr)
+
+                if m:
+                    element.set(
+                        attr_name, "{}static/{}/{}".format(
+                            m.group(1) or "", self._prefix, attr[m.end():]
+                        )
+                    )
+                elif attr in ["app.js", "app.css"]:
+                    element.set(
+                        attr_name, "app-{}.{}"
+                            .format(self._prefix, attr.split(".")[1])
+                    )
+            #end for
+        #end for
     #end function
 
 #end class
