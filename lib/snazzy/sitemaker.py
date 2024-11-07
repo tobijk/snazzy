@@ -32,6 +32,7 @@ import subprocess
 import sys
 import textwrap
 
+from multiprocessing import Pool
 from pathspec import PathSpec
 
 from snazzy.appmaker import AppMaker
@@ -57,11 +58,14 @@ class SiteMaker:
         return self
     #end function
 
-    def make(self, debug: bool = False) -> "SiteMaker":
+    def make(self, debug: bool = False, num_proc: int = 1) -> "SiteMaker":
+        LOGGER.info("building site with {} processes".format(num_proc))
+
         tasks = self._create_tasks(debug=debug)
 
-        for t in tasks:
-            t.execute()
+        with Pool(processes=num_proc) as pool:
+            for t in tasks:
+                t.execute(pool)
 
         return self
     #end function

@@ -27,6 +27,8 @@ import logging
 import os
 import shutil
 
+from multiprocessing import Pool
+
 from snazzy.error import SnazzyError
 from snazzy.task import Task
 
@@ -34,7 +36,7 @@ LOGGER = logging.getLogger(__name__)
 
 class PrepTask(Task):
 
-    def execute(self) -> None:
+    def execute(self, worker_pool: Pool) -> None:
         self._sanity_check()
 
         for module in ["handlebars", "jquery", "marked"]:

@@ -24,20 +24,18 @@
 #
 
 import logging
-import multiprocessing
 import os
 import shutil
 
+from multiprocessing import Pool
 from snazzy.task import Task
 
 LOGGER = logging.getLogger(__name__)
 
 class CopyFiles(Task):
 
-    def execute(self) -> None:
-        multiprocessing.Pool(processes=os.cpu_count()*2).map(
-            self._process_entry, self._objects
-        )
+    def execute(self, worker_pool: Pool) -> None:
+        worker_pool.map(self._process_entry, self._objects)
 
     def _process_entry(self, entry: str) -> None:
         LOGGER.info("processing {}".format(entry))

@@ -25,6 +25,7 @@
 
 import getopt
 import logging
+import os
 import re
 import sys
 import textwrap
@@ -170,19 +171,23 @@ class SnazzyCli:
         OPTIONS:
 
           --debug    Don't mangle and optimize CSS and JavaScript in any way.
+          -j <num>   Number of processes to use for parallel processing.
 
         """
         )
 
         try:
-            opts, args = getopt.getopt(args, "h", ["help", "debug"])
+            opts, args = getopt.getopt(args, "hj:", ["help", "debug"])
         except getopt.GetoptError as e:
             raise InvocationError(
                 "error parsing command line: {}".format(str(e))
             )
 
         options = {
-            "debug": False
+            "debug":
+                False,
+            "num_proc":
+                os.cpu_count() or 2
         }
 
         for o, v in opts:
@@ -191,6 +196,15 @@ class SnazzyCli:
                 sys.exit(SnazzyCli.EXIT_OK)
             elif o == "--debug":
                 options["debug"] = True
+            elif o == "-j":
+                try:
+                    options["num_proc"] = int(v)
+                except ValueError:
+                    raise InvocationError(
+                        "invalid argument to -j: {}".format(v)
+                    )
+                #end try
+            #end ifs
         #end for
 
         if len(args) > 0:

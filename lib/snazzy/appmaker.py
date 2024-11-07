@@ -23,6 +23,7 @@
 # THE SOFTWARE.
 #
 
+import functools
 import logging
 import os
 import re
@@ -30,6 +31,7 @@ import subprocess
 import sys
 import tempfile
 
+from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
 
 from lxml import etree
@@ -42,12 +44,16 @@ LOGGER = logging.getLogger(__name__)
 
 class AppMaker(Task):
 
-    def execute(self):
+    def execute(self, worker_pool: Pool) -> None:
+        partial_generate_app = functools.partial(
+            self._generate_app, worker_pool=worker_pool
+        )
+
         with ThreadPool(len(self._objects)) as pool:
-            pool.map(self._generate_app, self._objects)
+            pool.map(partial_generate_app, self._objects)
     #end function
 
-    def _generate_app(self, entry):
+    def _generate_app(self, entry, worker_pool: Pool) -> None:
         LOGGER.info("building SPA at {}".format(os.path.dirname(entry)))
 
         srcfile = os.path.normpath(
@@ -81,7 +87,7 @@ class AppMaker(Task):
             #end for
         #end for
 
-        results = component_maker.execute()
+        results = component_maker.execute(worker_pool)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpjs  = os.path.join(tmpdir, "app.js")

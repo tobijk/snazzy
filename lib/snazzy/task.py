@@ -28,6 +28,8 @@ import re
 import shutil
 import subprocess
 
+from multiprocessing import Pool
+
 from lxml import etree
 
 class Task:
@@ -44,7 +46,7 @@ class Task:
     def add_object(self, entry: str) -> None:
         self._objects.append(entry)
 
-    def execute(self) -> None:
+    def execute(self, worker_pool: Pool) -> None:
         raise NotImplementedError(
             "{} has no execute method".format(self.__class__.__name__)
         )

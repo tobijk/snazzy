@@ -27,16 +27,16 @@ import multiprocessing
 import os
 import subprocess
 
+from multiprocessing import Pool
+
 from lxml import etree
 
 from snazzy.task import Task
 
 class ComponentMaker(Task):
 
-    def execute(self):
-        with multiprocessing.Pool(processes=os.cpu_count()) as pool:
-            return pool.map(self._process_component_xml, self._objects)
-    #end function
+    def execute(self, worker_pool: Pool) -> None:
+        return worker_pool.map(self._process_component_xml, self._objects)
 
     def _process_component_xml(self, srcfile: str) -> tuple[str, str, str]:
         template   = ""
