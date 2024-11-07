@@ -60,19 +60,17 @@ class AppMaker(Task):
             os.sep.join([self._basedir, entry])
         )
 
-        srcdir = os.path.dirname(srcfile)
-
         dstfile = os.path.normpath(
             os.sep.join([self._sitedir, entry])
         )
 
+        srcdir = os.path.dirname(srcfile)
         dstdir = os.path.dirname(dstfile)
 
         os.makedirs(dstdir, exist_ok=True)
-        self._process_html(srcfile, dstfile)
 
-        appdir = os.path.join(os.path.dirname(srcfile), "+app")
-        appjs  = os.path.join(os.path.dirname(srcfile), "+app.js")
+        appdir = os.path.join(srcdir, "+app")
+        appjs  = os.path.join(srcdir, "+app.js")
 
         component_maker = ComponentMaker(
             self._basedir, self._sitedir, self._debug, self._prefix
@@ -81,11 +79,7 @@ class AppMaker(Task):
         for dirpath, dirnames, filenames in os.walk(appdir):
             for entry in filenames:
                 if entry.endswith(".xml"):
-                    component_maker.add_object(
-                        os.path.join(dirpath, entry)
-                    )
-            #end for
-        #end for
+                    component_maker.add_object(os.path.join(dirpath, entry))
 
         results = component_maker.execute(worker_pool)
 
@@ -104,25 +98,26 @@ class AppMaker(Task):
 
             with open(appjs, "r", encoding="utf-8") as f:
                 script = self._convert_js_in_memory(f.read())
-
             with open(tmpjs, "a+", encoding="utf-8") as f:
                 f.write(script)
-
             with open(tmpcss, "a+", encoding="utf-8"):
                 pass
 
             appjs = os.path.join(
-                os.path.dirname(dstfile), "app.js" if self._debug
-                    else "app-{}.js".format(self._prefix)
+                dstdir, "app.js" if self._debug else "app-{}.js"
+                    .format(self._prefix)
             )
+
             appcss = os.path.join(
-                os.path.dirname(dstfile), "app.css" if self._debug
-                    else "app-{}.css".format(self._prefix)
+                dstdir, "app.css" if self._debug else "app-{}.css"
+                    .format(self._prefix)
             )
 
             os.rename(tmpjs,  appjs)
             os.rename(tmpcss, appcss)
         #end with
+
+        self._process_html(srcfile, dstfile)
     #end function
 
     def _process_html(self, srcfile: str, dstfile: str) -> None:
