@@ -27,7 +27,7 @@ import logging
 import os
 import shutil
 
-from multiprocessing import Pool
+from multiprocessing.pool import Pool
 from snazzy.task import Task
 
 LOGGER = logging.getLogger(__name__)

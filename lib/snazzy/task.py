@@ -28,7 +28,8 @@ import re
 import shutil
 import subprocess
 
-from multiprocessing import Pool
+from multiprocessing.pool import Pool
+from typing import Any
 
 from lxml import etree
 
@@ -46,7 +47,7 @@ class Task:
     def add_object(self, entry: str) -> None:
         self._objects.append(entry)
 
-    def execute(self, worker_pool: Pool) -> None:
+    def execute(self, worker_pool: Pool) -> Any:
         raise NotImplementedError(
             "{} has no execute method".format(self.__class__.__name__)
         )
@@ -62,7 +63,7 @@ class Task:
     #end function
 
     def _convert_scss_in_memory(
-            self, scss: str, include_paths: list[str] = None) -> str:
+            self, scss: str, include_paths: list[str] | None = None) -> str:
         if include_paths is None:
             include_paths = []
 

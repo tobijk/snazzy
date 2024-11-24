@@ -26,12 +26,10 @@
 import functools
 import logging
 import os
-import re
-import subprocess
 import sys
 import tempfile
 
-from multiprocessing import Pool
+from multiprocessing.pool import Pool
 from multiprocessing.pool import ThreadPool
 
 from lxml import etree
@@ -53,7 +51,7 @@ class AppMaker(Task):
             pool.map(partial_generate_app, self._objects)
     #end function
 
-    def _generate_app(self, entry, worker_pool: Pool) -> None:
+    def _generate_app(self, entry, worker_pool) -> None:
         LOGGER.info("building SPA at {}".format(os.path.dirname(entry)))
 
         srcfile = os.path.normpath(

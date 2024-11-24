@@ -27,7 +27,7 @@ import logging
 import os
 import shutil
 
-from multiprocessing import Pool
+from multiprocessing.pool import Pool
 
 from snazzy.error import SnazzyError
 from snazzy.task import Task
