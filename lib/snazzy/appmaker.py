@@ -26,6 +26,7 @@
 import functools
 import logging
 import os
+import shutil
 import sys
 import tempfile
 
@@ -74,7 +75,7 @@ class AppMaker(Task):
             self._basedir, self._sitedir, self._debug, self._prefix
         )
 
-        for dirpath, dirnames, filenames in os.walk(appdir):
+        for dirpath, _, filenames in os.walk(appdir):
             for entry in filenames:
                 if entry.endswith(".xml"):
                     component_maker.add_object(os.path.join(dirpath, entry))
@@ -111,8 +112,8 @@ class AppMaker(Task):
                     .format(self._prefix)
             )
 
-            os.rename(tmpjs,  appjs)
-            os.rename(tmpcss, appcss)
+            shutil.move(tmpjs,  appjs)
+            shutil.move(tmpcss, appcss)
         #end with
 
         self._process_html(srcfile, dstfile)
