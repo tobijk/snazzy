@@ -82,8 +82,20 @@ class {class_name} {{
 
 class Component:
 
-    def __init__(self, name):
+    def __init__(
+        self,
+        name: str,
+        template: str | None = None,
+        script: str | None = None,
+        style: str | None = None,
+        dependencies: list[str] = []
+    ):
         self.name = name
+        self.template = template
+        self.script = script
+        self.style = style
+        self.dependencies = dependencies
+    #end function
 
     def generate(self):
         class_name = "".join([s.capitalize() for s in self.name.split("-")])

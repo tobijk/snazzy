@@ -80,13 +80,17 @@ class AppMaker(Task):
                 if entry.endswith(".xml"):
                     component_maker.add_object(os.path.join(dirpath, entry))
 
-        results = component_maker.execute(worker_pool)
+        all_components = component_maker.execute(worker_pool)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpjs  = os.path.join(tmpdir, "app.js")
             tmpcss = os.path.join(tmpdir, "app.css")
 
-            for template, script, stylesheet in results:
+            for component in all_components:
+                template   = component.template
+                script     = component.script
+                stylesheet = component.style
+
                 with open(tmpjs, "a+", encoding="utf-8") as f:
                     f.write(template)
                     f.write(script)

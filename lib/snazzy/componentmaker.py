@@ -26,21 +26,68 @@
 import os
 import subprocess
 
+from collections import OrderedDict
 from multiprocessing.pool import Pool
 
 from lxml import etree
 
 from snazzy.task import Task
+from snazzy.component import Component
 
 class ComponentMaker(Task):
 
-    def execute(self, worker_pool: Pool) -> list[tuple[str, str, str]]:
-        return worker_pool.map(self._process_component_xml, self._objects)
+    def execute(self, worker_pool: Pool) -> list[Component]:
+        component_by_name = {
+            c.name: c for c in \
+                worker_pool.map(self._process_component_xml, self._objects)
+        }
 
-    def _process_component_xml(self, srcfile: str) -> tuple[str, str, str]:
+        dependencies = OrderedDict()
+
+        for component in component_by_name.values():
+            if component.name in dependencies:
+                continue
+            self._resolve_dependencies(
+                component, component_by_name, dependencies, []
+            )
+        #end for
+
+        return list(dependencies.values())
+    #end function
+
+    def _resolve_dependencies(
+        self,
+        component: Component,
+        component_by_name: dict[str, Component],
+        dependencies: dict[str, Component],
+        dependency_stack: list[str] = []
+    ) -> None:
+        for dependency in component.dependencies:
+            if dependency not in dependencies:
+                if dependency in dependency_stack:
+                    raise ValueError(
+                        "circular dependency detected: " + " -> ".join(
+                            dependency_stack + [dependency]
+                        )
+                    )
+
+                self._resolve_dependencies(
+                    component_by_name[dependency],
+                    component_by_name,
+                    dependencies,
+                    dependency_stack + [dependency]
+                )
+        #end for
+
+        dependencies[component.name] = component
+    #end function
+
+    def _process_component_xml(self, srcfile: str) -> Component:
         template   = ""
         script     = ""
         stylesheet = ""
+
+        dependencies = []
 
         tree = etree.parse(srcfile)
         root = tree.getroot()
@@ -48,6 +95,13 @@ class ComponentMaker(Task):
         self._apply_static_asset_prefix(root)
 
         component_name = root.get("name", os.path.basename(srcfile)[:-4])
+
+        dependencies_node = root.find("dependencies")
+        if dependencies_node is not None:
+            dependencies = [
+                node.text.strip() for node in \
+                    dependencies_node.findall("depends")
+            ]
 
         template_node = root.find("template")
         script_node   = root.find("script")
@@ -81,7 +135,13 @@ class ComponentMaker(Task):
             stylesheet = \
                 self._convert_scss_in_memory(style_node.text)
 
-        return template, script, stylesheet
+        return Component(
+            component_name,
+            template=template,
+            script=script,
+            style=stylesheet,
+            dependencies=dependencies
+        )
     #end function
 
 #end class
