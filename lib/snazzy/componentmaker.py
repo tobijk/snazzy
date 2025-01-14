@@ -38,8 +38,9 @@ class ComponentMaker(Task):
 
     def execute(self, worker_pool: Pool) -> list[Component]:
         component_by_name = {
-            c.name: c for c in \
-                worker_pool.map(self._process_component_xml, self._objects)
+            c.name: c for c in worker_pool.map(
+                self.process_component_xml_safety_wrapper, self._objects
+            )
         }
 
         dependencies = OrderedDict()
@@ -80,6 +81,13 @@ class ComponentMaker(Task):
         #end for
 
         dependencies[component.name] = component
+    #end function
+
+    def process_component_xml_safety_wrapper(self, srcfile: str) -> Component:
+        try:
+            return self._process_component_xml(srcfile)
+        except Exception as e:
+            raise RuntimeError(str(e))
     #end function
 
     def _process_component_xml(self, srcfile: str) -> Component:
