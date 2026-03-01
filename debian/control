@@ -1,0 +1,29 @@
+Source: snazzy
+Section: web
+Priority: optional
+Maintainer: Tobias Koch <tobias.koch@gmail.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ dh-sequence-python3,
+ pybuild-plugin-pyproject,
+ python3-all,
+ python3-setuptools,
+ python3-wheel
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: snazzy
+Architecture: all
+Depends:
+ ${python3:Depends},
+ ${misc:Depends},
+ python3-lxml,
+ python3-pathspec,
+ python3-tidylib,
+ nodejs,
+ npm
+Description: The low-npm frontend framework
+ Snazzy is a minimal web development framework that builds single-page
+ applications from single-file XML components. It uses Handlebars for
+ templating, jQuery for DOM manipulation, Babel for JavaScript
+ transpilation, and Sass for CSS preprocessing.

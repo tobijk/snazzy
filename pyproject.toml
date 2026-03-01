@@ -9,8 +9,12 @@ authors = [
 
 dependencies = [
     "pytidylib",
-    "lxml"
+    "lxml",
+    "pathspec"
 ]
+
+[project.scripts]
+snazzy = "snazzy.cli:SnazzyCli.main"
 
 [build-system]
 requires = ["setuptools", "wheel"]
