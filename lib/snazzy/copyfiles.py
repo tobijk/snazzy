@@ -64,6 +64,8 @@ class CopyFiles(Task):
                 os.sep.join([self._sitedir, entry])
             )
             self._convert_js(srcfile, dstfile)
+            if not self._debug:
+                self._obfuscate_js(dstfile, dstfile)
 
         else:
             shutil.copy2(srcfile, destdir)

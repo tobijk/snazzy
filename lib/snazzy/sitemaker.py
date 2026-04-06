@@ -141,7 +141,8 @@ class SiteMaker:
             "handlebars",
             "jquery",
             "marked",
-            "sass"
+            "sass",
+            "terser"
         ]
 
         if npm_reinstall:

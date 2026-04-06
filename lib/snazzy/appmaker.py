@@ -118,6 +118,9 @@ class AppMaker(Task):
 
             shutil.move(tmpjs,  appjs)
             shutil.move(tmpcss, appcss)
+
+            if not self._debug:
+                self._obfuscate_js(appjs, appjs)
         #end with
 
         self._process_html(srcfile, dstfile)

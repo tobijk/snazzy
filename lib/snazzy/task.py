@@ -120,6 +120,18 @@ class Task:
         return result.stdout
     #end function
 
+    def _obfuscate_js(self, srcfile: str, dstfile: str) -> None:
+        cmd = [
+            "./node_modules/.bin/terser",
+                "--compress",
+                    "--mangle",
+                        "-o", dstfile, srcfile
+        ]
+
+        subprocess.run(cmd)
+    #end function
+
+
     def _apply_static_asset_prefix(self, fragment: etree.Element) -> None:
         if not self._prefix:
             return
