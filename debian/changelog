@@ -1,3 +1,9 @@
+snazzy (0.2.0-1) unstable; urgency=medium
+
+  * Obfuscate JavaScript in production builds using Terser.
+
+ -- Tobias Koch <tobias.koch@gmail.com>  Mon, 06 Apr 2026 11:42:30 +0300
+
 snazzy (0.1.0-1) unstable; urgency=medium
 
   * Initial release.
